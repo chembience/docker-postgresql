@@ -1,5 +1,6 @@
-FROM markussitzmann/keel:20170701
+FROM markussitzmann/appdockbase:20170701
 MAINTAINER markussitzmann@gmail.com forked from sameer@damagehead.com
+ARG BUILD_LABEL
 
 ENV PG_APP_HOME="/etc/docker-postgresql"\
     PG_VERSION=9.6 \
