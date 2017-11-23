@@ -1,5 +1,5 @@
-ARG BUILD_LABEL
-FROM markussitzmann/appdock_base:$BUILD_LABEL
+ARG build_label
+FROM markussitzmann/appdock_base:$build_label
 MAINTAINER markussitzmann@gmail.com forked from sameer@damagehead.com
 
 
