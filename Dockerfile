@@ -26,6 +26,17 @@ RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-k
  && rm -rf /var/lib/apt/lists/*
 
 ### RDKIT
+
+#######################################################################
+# Prepare the environment for the rdkit compilation:
+ENV RDBASE="/opt/rdkit"
+ENV LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$RDBASE/lib:/usr/lib/x86_64-linux-gnu"
+#ENV PYTHONPATH="$PYTHONPATH:$RDBASE"
+#ENV PostgreSQL_ROOT="/usr/lib/postgresql/9.6"
+#ENV PostgreSQL_TYPE_INCLUDE_DIR="/usr/include/postgresql/9.6/server"
+#ENV PGPASSWORD="$POSTGRES_PASSWORD"
+#ENV PGUSER="$POSTGRES_USER"
+
 ENV RDKIT_BRANCH="master"
 
 WORKDIR /opt
