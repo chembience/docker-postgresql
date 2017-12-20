@@ -25,6 +25,60 @@ RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-k
  && rm -rf ${PG_HOME} \
  && rm -rf /var/lib/apt/lists/*
 
+### RDKIT
+ENV RDKIT_BRANCH="master"
+
+WORKDIR /opt
+
+#######################################################################
+# Prepare the build requirements for the rdkit compilation:
+RUN apt-get update && apt-get install -y \
+    postgresql-server-dev-all \
+    postgresql-client \
+    postgresql-plpython-9.6 \
+    postgresql-plpython3-9.6 \
+    git \
+    cmake \
+    build-essential \
+    python-numpy \
+    python-dev \
+    sqlite3 \
+    libsqlite3-dev \
+    libboost-dev \
+    libboost-system-dev \
+    libboost-thread-dev \
+    libboost-serialization-dev \
+    libboost-python-dev \
+    libboost-regex-dev \
+    libeigen3-dev && \
+# Cloning RDKit git repo:
+    git clone -b $RDKIT_BRANCH --single-branch https://github.com/rdkit/rdkit.git && \
+    mkdir $RDBASE/build && \
+    cd $RDBASE/build && \
+# Compiling and installing RDKit:
+    cmake \
+      -DRDK_BUILD_INCHI_SUPPORT=ON \
+      -DRDK_BUILD_PGSQL=ON \
+      -DRDK_BUILD_AVALON_SUPPORT=ON \
+      -DPostgreSQL_TYPE_INCLUDE_DIR="/usr/include/postgresql/9.6/server" \
+      -DPostgreSQL_ROOT="/usr/lib/postgresql/9.6" .. && \
+    make -j `nproc` && \
+    make install && \
+# Installing RDKit Postgresql extension:
+    sh Code/PgSQL/rdkit/pgsql_install.sh && \
+# Cleaning up:
+    make clean && \
+    cd $RDBASE && \
+    rm -r $RDBASE/build && \
+    apt-get remove -y git cmake build-essential && \
+    apt-get autoremove --purge -y && \
+    apt-get clean && \
+    apt-get purge && \
+    rm -rf /var/lib/apt/lists/*
+
+### RDKIT done
+
+
 COPY runtime/ ${PG_APP_HOME}/
 COPY entrypoint.sh /sbin/entrypoint.sh
 RUN chmod 755 /sbin/entrypoint.sh
