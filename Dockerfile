@@ -52,16 +52,16 @@ RUN apt-get update && apt-get install -y \
     make -j `nproc` && \
     make install && \
 # Installing RDKit Postgresql extension:
-    sh Code/PgSQL/rdkit/pgsql_install.sh && \
+    sh Code/PgSQL/rdkit/pgsql_install.sh
 # Cleaning up:
-    make clean && \
-    cd $RDBASE && \
-    rm -r $RDBASE/build && \
-    apt-get remove -y git cmake build-essential && \
-    apt-get autoremove --purge -y && \
-    apt-get clean && \
-    apt-get purge && \
-    rm -rf /var/lib/apt/lists/*
+#    make clean && \
+#    cd $RDBASE && \
+#    rm -r $RDBASE/build && \
+#    apt-get remove -y git cmake build-essential && \
+#    apt-get autoremove --purge -y && \
+#    apt-get clean && \
+#    apt-get purge && \
+#    rm -rf /var/lib/apt/lists/*
 
 ### RDKIT done
 
