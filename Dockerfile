@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y \
     curl wget gosu sudo \
     gnupg \
     unzip tar bzip2 \
-    git
+    git \
     postgresql-server-dev-all \
     postgresql-client \
     postgresql-plpython-9.6 \
