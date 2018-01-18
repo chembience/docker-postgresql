@@ -1,25 +1,19 @@
 ARG build_label
-FROM markussitzmann/appdock_base:$build_label as rdkit-build
+FROM debian:stretch as rdkit-build
 
-### RDKIT
-
-#######################################################################
-# Prepare the environment for the rdkit compilation:
 ENV RDBASE="/opt/rdkit"
 ENV LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$RDBASE/lib:/usr/lib/x86_64-linux-gnu"
-#ENV PYTHONPATH="$PYTHONPATH:$RDBASE"
-#ENV PostgreSQL_ROOT="/usr/lib/postgresql/9.6"
-#ENV PostgreSQL_TYPE_INCLUDE_DIR="/usr/include/postgresql/9.6/server"
-#ENV PGPASSWORD="$POSTGRES_PASSWORD"
-#ENV PGUSER="$POSTGRES_USER"
 
 ENV RDKIT_BRANCH="master"
 
 WORKDIR /opt
 
-#######################################################################
-# Prepare the build requirements for the rdkit compilation:
 RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    curl wget gosu sudo \
+    gnupg \
+    unzip tar bzip2 \
+    git
     postgresql-server-dev-all \
     postgresql-client \
     postgresql-plpython-9.6 \
@@ -38,11 +32,11 @@ RUN apt-get update && apt-get install -y \
     libboost-python-dev \
     libboost-regex-dev \
     libeigen3-dev && \
-# Cloning RDKit git repo:
+
     git clone -b $RDKIT_BRANCH --single-branch https://github.com/rdkit/rdkit.git && \
     mkdir $RDBASE/build && \
     cd $RDBASE/build && \
-# Compiling and installing RDKit:
+
     cmake \
       -DRDK_BUILD_INCHI_SUPPORT=ON \
       -DRDK_BUILD_PGSQL=ON \
@@ -50,20 +44,7 @@ RUN apt-get update && apt-get install -y \
       -DPostgreSQL_TYPE_INCLUDE_DIR="/usr/include/postgresql/9.6/server" \
       -DPostgreSQL_ROOT="/usr/lib/postgresql/9.6" .. && \
     make -j `nproc` && \
-    make install && \
-# Installing RDKit Postgresql extension:
-    sh Code/PgSQL/rdkit/pgsql_install.sh
-# Cleaning up:
-#    make clean && \
-#    cd $RDBASE && \
-#    rm -r $RDBASE/build && \
-#    apt-get remove -y git cmake build-essential && \
-#    apt-get autoremove --purge -y && \
-#    apt-get clean && \
-#    apt-get purge && \
-#    rm -rf /var/lib/apt/lists/*
-
-### RDKIT done
+    make install
 
 
 ARG build_label
@@ -92,6 +73,12 @@ RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-k
  && ln -sf ${PG_DATADIR}/pg_ident.conf /etc/postgresql/${PG_VERSION}/main/pg_ident.conf \
  && rm -rf ${PG_HOME} \
  && rm -rf /var/lib/apt/lists/*
+
+
+COPY --from=rdkit-build /opt/rdkit/build/Code/PgSQL/rdkit/rdkit--3.5.sql /usr/share/postgresql/9.6/extension
+COPY --from=rdkit-build /opt/rdkit/Code/PgSQL/rdkit/rdkit.control /usr/share/postgresql/9.6/extension
+COPY --from=rdkit-build /opt/rdkit/build/Code/PgSQL/rdkit/librdkit.so /usr/lib/postgresql/9.6/lib/rdkit.so
+
 
 COPY runtime/ ${PG_APP_HOME}/
 COPY entrypoint.sh /sbin/entrypoint.sh
