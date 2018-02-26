@@ -78,7 +78,7 @@ RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-k
 COPY --from=rdkit-build /opt/rdkit/build/Code/PgSQL/rdkit/rdkit--3.5.sql /usr/share/postgresql/9.6/extension
 COPY --from=rdkit-build /opt/rdkit/Code/PgSQL/rdkit/rdkit.control /usr/share/postgresql/9.6/extension
 COPY --from=rdkit-build /opt/rdkit/build/Code/PgSQL/rdkit/librdkit.so /usr/lib/postgresql/9.6/lib/rdkit.so
-COPY --from=rdkit-build /usr/lib/x86_64-linux-gnu/libboost_thread.so.1.62.0 /usr/lib/x86_64-linux-gnu/libboost_thread.so.1.62.0
+COPY --from=rdkit-build /usr/lib/x86_64-linux-gnu/libboost_* /usr/lib/x86_64-linux-gnu/
 
 
 COPY runtime/ ${PG_APP_HOME}/
