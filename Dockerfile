@@ -1,5 +1,6 @@
 ARG build_label
 FROM debian:stretch as rdkit-build
+LABEL maintainer="markussitzmann@gmail.com "
 
 ENV RDBASE="/opt/rdkit"
 ENV LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$RDBASE/lib:/usr/lib/x86_64-linux-gnu"
@@ -49,7 +50,8 @@ RUN apt-get update && apt-get install -y \
 
 ARG build_label
 FROM markussitzmann/appdock_base:$build_label
-MAINTAINER markussitzmann@gmail.com forked from sameer@damagehead.com
+LABEL maintainer="markussitzmann@gmail.com "
+LABEL origin="docker-postgresql sameer@damagehead.com"
 
 
 ENV PG_APP_HOME="/etc/docker-postgresql"\
