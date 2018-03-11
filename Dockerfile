@@ -49,7 +49,7 @@ RUN apt-get update && apt-get install -y \
 
 
 ARG build_label
-FROM markussitzmann/appdock_base:$build_label
+FROM markussitzmann/chembience_base:$build_label
 LABEL maintainer="markussitzmann@gmail.com "
 LABEL origin="docker-postgresql sameer@damagehead.com"
 
