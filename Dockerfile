@@ -1,27 +1,34 @@
 ARG build_label
 FROM debian:stretch as rdkit-build
-LABEL maintainer="markussitzmann@gmail.com "
+LABEL maintainer="markussitzmann@gmail.com"
+
 
 ENV RDBASE="/opt/rdkit"
 ENV LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$RDBASE/lib:/usr/lib/x86_64-linux-gnu"
 
-ENV RDKIT_BRANCH="master"
+ENV PG_VERSION=10
+
+ENV RDKIT_BRANCH="Release_2018_03"
 
 WORKDIR /opt
 
-RUN apt-get update && apt-get install -y \
+RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main" >> /etc/apt/sources.list.d/pgdg.list'
+
+RUN apt-get update && apt-get -y --no-install-recommends install \
     ca-certificates \
-    curl wget gosu sudo \
-    gnupg \
-    unzip tar bzip2 \
-    git \
+    curl wget gosu sudo unzip tar bzip2 \
+    git gnupg2 \
+    cmake \
+    build-essential
+
+RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+ && echo 'deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main' > /etc/apt/sources.list.d/pgdg.list \
+ && apt-get update && apt-get install -y --no-install-recommends  \
     postgresql-server-dev-all \
     postgresql-client \
-    postgresql-plpython-9.6 \
-    postgresql-plpython3-9.6 \
-    git \
-    cmake \
-    build-essential \
+    postgresql-plpython-${PG_VERSION} \
+    postgresql-plpython3-${PG_VERSION} \
+
     python-numpy \
     python-dev \
     sqlite3 \
@@ -42,8 +49,8 @@ RUN apt-get update && apt-get install -y \
       -DRDK_BUILD_INCHI_SUPPORT=ON \
       -DRDK_BUILD_PGSQL=ON \
       -DRDK_BUILD_AVALON_SUPPORT=ON \
-      -DPostgreSQL_TYPE_INCLUDE_DIR="/usr/include/postgresql/9.6/server" \
-      -DPostgreSQL_ROOT="/usr/lib/postgresql/9.6" .. && \
+      -DPostgreSQL_TYPE_INCLUDE_DIR="/usr/include/postgresql/${PG_VERSION}/server" \
+      -DPostgreSQL_ROOT="/usr/lib/postgresql/${PG_VERSION}" .. && \
     make -j `nproc` && \
     make install
 
@@ -54,7 +61,7 @@ LABEL maintainer="markussitzmann@gmail.com "
 LABEL origin="docker-postgresql sameer@damagehead.com"
 
 
-ENV PG_APP_HOME="/etc/docker-postgresql"\
+ENV PG_APP_HOME="/etc/docker-postgresql" \
     PG_VERSION=10 \
     PG_USER=postgres \
     PG_HOME=/var/lib/postgresql \
@@ -77,9 +84,9 @@ RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-k
  && rm -rf /var/lib/apt/lists/*
 
 
-COPY --from=rdkit-build /opt/rdkit/build/Code/PgSQL/rdkit/rdkit--3.5.sql /usr/share/postgresql/{PG_VERSION}/extension
-COPY --from=rdkit-build /opt/rdkit/Code/PgSQL/rdkit/rdkit.control /usr/share/postgresql/{PG_VERSION}/extension
-COPY --from=rdkit-build /opt/rdkit/build/Code/PgSQL/rdkit/librdkit.so /usr/lib/postgresql/{PG_VERSION}/lib/rdkit.so
+COPY --from=rdkit-build /opt/rdkit/build/Code/PgSQL/rdkit/rdkit--3.5.sql /usr/share/postgresql/${PG_VERSION}/extension
+COPY --from=rdkit-build /opt/rdkit/Code/PgSQL/rdkit/rdkit.control /usr/share/postgresql/${PG_VERSION}/extension
+COPY --from=rdkit-build /opt/rdkit/build/Code/PgSQL/rdkit/librdkit.so /usr/lib/postgresql/${PG_VERSION}/lib/rdkit.so
 COPY --from=rdkit-build /usr/lib/x86_64-linux-gnu/libboost_* /usr/lib/x86_64-linux-gnu/
 
 
