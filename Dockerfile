@@ -49,13 +49,13 @@ RUN apt-get update && apt-get install -y \
 
 
 ARG build_label
-FROM markussitzmann/chembience_base:$build_label
+FROM chembience/base:$build_label
 LABEL maintainer="markussitzmann@gmail.com "
 LABEL origin="docker-postgresql sameer@damagehead.com"
 
 
 ENV PG_APP_HOME="/etc/docker-postgresql"\
-    PG_VERSION=9.6 \
+    PG_VERSION=10 \
     PG_USER=postgres \
     PG_HOME=/var/lib/postgresql \
     PG_RUNDIR=/run/postgresql \
@@ -77,9 +77,9 @@ RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-k
  && rm -rf /var/lib/apt/lists/*
 
 
-COPY --from=rdkit-build /opt/rdkit/build/Code/PgSQL/rdkit/rdkit--3.5.sql /usr/share/postgresql/9.6/extension
-COPY --from=rdkit-build /opt/rdkit/Code/PgSQL/rdkit/rdkit.control /usr/share/postgresql/9.6/extension
-COPY --from=rdkit-build /opt/rdkit/build/Code/PgSQL/rdkit/librdkit.so /usr/lib/postgresql/9.6/lib/rdkit.so
+COPY --from=rdkit-build /opt/rdkit/build/Code/PgSQL/rdkit/rdkit--3.5.sql /usr/share/postgresql/{PG_VERSION}/extension
+COPY --from=rdkit-build /opt/rdkit/Code/PgSQL/rdkit/rdkit.control /usr/share/postgresql/{PG_VERSION}/extension
+COPY --from=rdkit-build /opt/rdkit/build/Code/PgSQL/rdkit/librdkit.so /usr/lib/postgresql/{PG_VERSION}/lib/rdkit.so
 COPY --from=rdkit-build /usr/lib/x86_64-linux-gnu/libboost_* /usr/lib/x86_64-linux-gnu/
 
 
