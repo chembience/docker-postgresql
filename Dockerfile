@@ -1,5 +1,5 @@
 ARG build_label
-FROM chembience/rdkit_postgres_compile:$build_label as rdkit-build
+FROM chembience/rdkit-postgres-compile:$build_label as rdkit-build
 FROM chembience/base:$build_label
 LABEL maintainer="markussitzmann@gmail.com "
 LABEL origin="docker-postgresql sameer@damagehead.com"
