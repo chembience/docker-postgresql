@@ -12,7 +12,6 @@ ENV PG_APP_HOME="/etc/docker-postgresql" \
     PG_RUNDIR=/run/postgresql \
     PG_LOGDIR=/var/log/postgresql \
     PG_CERTDIR=/etc/postgresql/certs
-    RDKIT_SQL=3.7
 
 ENV PG_BINDIR=/usr/lib/postgresql/${PG_VERSION}/bin \
     PG_DATADIR=${PG_HOME}/${PG_VERSION}/main
@@ -29,7 +28,7 @@ RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-k
  && rm -rf /var/lib/apt/lists/*
 
 
-COPY --from=rdkit-build /opt/rdkit/build/Code/PgSQL/rdkit/rdkit--${RDKIT_SQL}.sql /usr/share/postgresql/${PG_VERSION}/extension
+COPY --from=rdkit-build /opt/rdkit/build/Code/PgSQL/rdkit/rdkit--3.5.sql /usr/share/postgresql/${PG_VERSION}/extension
 COPY --from=rdkit-build /opt/rdkit/Code/PgSQL/rdkit/rdkit.control /usr/share/postgresql/${PG_VERSION}/extension
 COPY --from=rdkit-build /opt/rdkit/build/Code/PgSQL/rdkit/librdkit.so /usr/lib/postgresql/${PG_VERSION}/lib/rdkit.so
 COPY --from=rdkit-build /usr/lib/x86_64-linux-gnu/libboost_* /usr/lib/x86_64-linux-gnu/
