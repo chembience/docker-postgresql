@@ -1,6 +1,6 @@
 ARG build_tag
 FROM chembience/rdkit-postgres-compile:$build_tag as rdkit-build
-FROM chembience/base:$build_arg
+FROM chembience/base:$build_tag
 LABEL maintainer="markus.sitzmann@gmail.com "
 LABEL origin="docker-postgresql sameer@damagehead.com"
 
